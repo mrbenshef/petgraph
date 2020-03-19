@@ -812,11 +812,11 @@ where
     ///
     /// The resulting graph has the same structure and the same
     /// graph indices as `self`.
-    pub fn map<'a, F, G, N2, E2>(
+    pub fn map<'a, F, G, N2, E2, Ty2: EdgeType, Ix2: IndexType>(
         &'a self,
         mut node_map: F,
         mut edge_map: G,
-    ) -> StableGraph<N2, E2, Ty, Ix>
+    ) -> StableGraph<N2, E2, Ty2, Ix2>
     where
         F: FnMut(NodeIndex<Ix>, &'a N) -> N2,
         G: FnMut(EdgeIndex<Ix>, &'a E) -> E2,
@@ -829,8 +829,8 @@ where
             g,
             node_count: self.node_count,
             edge_count: self.edge_count,
-            free_node: self.free_node,
-            free_edge: self.free_edge,
+            free_node: NodeIndex::new(self.free_node.index()),
+            free_edge: EdgeIndex::new(self.free_edge.index()),
         }
     }
 

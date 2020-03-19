@@ -1312,24 +1312,34 @@ where
     ///
     /// The resulting graph has the same structure and the same
     /// graph indices as `self`.
-    pub fn map<'a, F, G, N2, E2>(
+    pub fn map<'a, F, G, N2, E2, Ty2: EdgeType, Ix2: IndexType>(
         &'a self,
         mut node_map: F,
         mut edge_map: G,
-    ) -> Graph<N2, E2, Ty, Ix>
+    ) -> Graph<N2, E2, Ty2, Ix2>
     where
         F: FnMut(NodeIndex<Ix>, &'a N) -> N2,
         G: FnMut(EdgeIndex<Ix>, &'a E) -> E2,
     {
-        let mut g = Graph::with_capacity(self.node_count(), self.edge_count());
+        let mut g: Graph<N2, E2, Ty2, Ix2> =
+            Graph::with_capacity(self.node_count(), self.edge_count());
         g.nodes.extend(enumerate(&self.nodes).map(|(i, node)| Node {
             weight: node_map(NodeIndex::new(i), &node.weight),
-            next: node.next,
+            next: [
+                EdgeIndex::new(node.next[0].index()),
+                EdgeIndex::new(node.next[1].index()),
+            ],
         }));
         g.edges.extend(enumerate(&self.edges).map(|(i, edge)| Edge {
             weight: edge_map(EdgeIndex::new(i), &edge.weight),
-            next: edge.next,
-            node: edge.node,
+            next: [
+                EdgeIndex::new(edge.next[0].index()),
+                EdgeIndex::new(edge.next[1].index()),
+            ],
+            node: [
+                NodeIndex::new(edge.node[0].index()),
+                NodeIndex::new(edge.node[1].index()),
+            ],
         }));
         g
     }

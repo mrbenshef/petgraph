@@ -1534,6 +1534,11 @@ fn map_filter_map() {
     });
     assert_eq!(g4.edge_count(), g.edge_count() - 5);
     assert_graph_consistent(&g4);
+
+    let g5: Graph<&str, i32, Directed, u32> = g.map(|_, &node| node, |_, &edge| edge);
+    assert_eq!(g.node_count(), g5.node_count());
+    assert_eq!(g.edge_count(), g5.edge_count());
+    assert_graph_consistent(&g5);
 }
 
 #[test]
